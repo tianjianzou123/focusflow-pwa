@@ -17,6 +17,7 @@ function loadTasks() {
   }
 }
 
+
 function Icon({ name }) {
   const paths = {
     plus: <path d="M12 5v14M5 12h14" />,
@@ -185,4 +186,3 @@ export default function App() {
     </main>
   );
 }
-

@@ -23,6 +23,7 @@ function pass(name, detail = "") {
   results.push({ test: name, status: "PASS", detail });
 }
 
+
 try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: "allow" });
   const page = await context.newPage();
@@ -116,4 +117,3 @@ try {
 } finally {
   await browser.close();
 }
-

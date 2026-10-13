@@ -2,12 +2,15 @@
 
 FocusFlow is a responsive to-do list created for **COMP10013 Dynamic Web Technologies — Practice Lab W5**. It is installable, works offline after the first visit, and stores tasks locally in the browser.
 
+- **Live PWA:** https://tianjianzou123.github.io/focusflow-pwa/
+- **Source code:** https://github.com/tianjianzou123/focusflow-pwa
+
 ## Verified results
 
-The production build was verified on 13 October 2026 with Microsoft Edge and Lighthouse:
+The deployed HTTPS production build was verified on 13 October 2026 with Microsoft Edge and Lighthouse:
 
 - Automated PWA checks: **8/8 passed** (manifest, task workflow, persistence, filters, active service worker, offline reload, runtime errors and mobile layout).
-- Lighthouse: **Performance 99**, **Accessibility 100**, **Best Practices 100**, **SEO 100**.
+- Online Lighthouse: **Performance 99**, **Accessibility 100**, **Best Practices 100**, **SEO 100**.
 - Dependency audit: **0 known vulnerabilities**.
 
 ## Run the project
@@ -66,11 +69,13 @@ Open the local URL shown by Vite in Google Chrome. Service workers require `loca
 
 ### Part 5 — Deployment and real-device testing
 
-Push this folder to GitHub and import the repository into Vercel. Vercel detects Vite automatically; use `npm run build` as the build command and `dist` as the output directory. The generated HTTPS URL can be opened in Chrome on Android and installed with **Add to Home screen / Install app**.
+The project is deployed automatically from the `main` branch with GitHub Actions and GitHub Pages:
 
-`vercel.json` records the Vite build settings and prevents stale caching of the service worker and manifest after an update.
+https://tianjianzou123.github.io/focusflow-pwa/
 
-The lab sheet describes deployment/real-device testing as an **option**, so it is not required for Parts 1–4 unless the separate submission brief or lecturer asks for a live URL. It is still recommended as the clearest evidence for Part 5.
+The deployment uses HTTPS, so the URL can be opened in Chrome on Android and installed with **Add to Home screen / Install app**. Every push to `main` runs ESLint, creates the Vite production build and publishes the `dist` directory.
+
+The same repository is also ready for Vercel: `vercel.json` records the Vite build settings and prevents stale caching of the service worker and manifest after an update. Vercel is optional because the lab sheet permits equivalent HTTPS hosting services.
 
 ## Main application features
 
@@ -95,3 +100,4 @@ src/main.jsx               Service worker registration
 ## Notes for demonstration
 
 The service worker deliberately pre-caches fixed production filenames. `vite.config.js` therefore gives the compiled JavaScript and CSS stable names (`assets/app.js` and `assets/app.css`). If the cached files change, increment `CACHE_NAME` in `public/service-worker.js` before deploying so existing installations receive the new version.
+

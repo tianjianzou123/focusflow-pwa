@@ -1,19 +1,22 @@
-const CACHE_NAME = "focusflow-v1.1.0";
+const CACHE_NAME = "focusflow-v1.2.0";
+const SCOPE_URL = new URL("./", self.location.href);
+const scopedUrl = (path) => new URL(path, SCOPE_URL).href;
+const OFFLINE_PAGE = scopedUrl("index.html");
 const APP_SHELL = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/assets/app.js",
-  "/assets/app.css",
-  "/icons/icon-48.png",
-  "/icons/icon-72.png",
-  "/icons/icon-96.png",
-  "/icons/icon-144.png",
-  "/icons/icon-168.png",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
-  "/icons/icon-maskable-512.png"
-];
+  "./",
+  "index.html",
+  "manifest.json",
+  "assets/app.js",
+  "assets/app.css",
+  "icons/icon-48.png",
+  "icons/icon-72.png",
+  "icons/icon-96.png",
+  "icons/icon-144.png",
+  "icons/icon-168.png",
+  "icons/icon-192.png",
+  "icons/icon-512.png",
+  "icons/icon-maskable-512.png"
+].map(scopedUrl);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -39,10 +42,10 @@ self.addEventListener("fetch", (event) => {
       fetch(event.request)
         .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put("/index.html", copy));
+          caches.open(CACHE_NAME).then((cache) => cache.put(OFFLINE_PAGE, copy));
           return response;
         })
-        .catch(() => caches.match("/index.html"))
+        .catch(() => caches.match(OFFLINE_PAGE))
     );
     return;
   }
@@ -60,3 +63,4 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
+

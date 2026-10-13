@@ -35,9 +35,9 @@ try {
   assert.equal(await page.getByRole("heading", { name: /Make space for/i }).isVisible(), true);
   pass("Production page loads", "HTTP 200, correct title and hero");
 
-  const manifest = await page.evaluate(async () => (await fetch("/manifest.json")).json());
+  const manifest = await page.evaluate(async () => (await fetch("./manifest.json")).json());
   assert.equal(manifest.display, "standalone");
-  assert.equal(manifest.start_url, "/");
+  assert.equal(manifest.start_url, ".");
   assert(manifest.icons.some((icon) => icon.sizes === "192x192"));
   assert(manifest.icons.some((icon) => icon.sizes === "512x512"));
   assert(manifest.icons.some((icon) => icon.purpose === "maskable"));
@@ -116,3 +116,4 @@ try {
 } finally {
   await browser.close();
 }
+

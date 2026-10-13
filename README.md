@@ -95,4 +95,3 @@ src/main.jsx               Service worker registration
 ## Notes for demonstration
 
 The service worker deliberately pre-caches fixed production filenames. `vite.config.js` therefore gives the compiled JavaScript and CSS stable names (`assets/app.js` and `assets/app.css`). If the cached files change, increment `CACHE_NAME` in `public/service-worker.js` before deploying so existing installations receive the new version.
-

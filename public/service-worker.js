@@ -1,4 +1,4 @@
-const CACHE_NAME = "focusflow-v1.2.0";
+const CACHE_NAME = "focusflow-v1.2.1";
 const SCOPE_URL = new URL("./", self.location.href);
 const scopedUrl = (path) => new URL(path, SCOPE_URL).href;
 const OFFLINE_PAGE = scopedUrl("index.html");

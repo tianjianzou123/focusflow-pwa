@@ -98,7 +98,7 @@ export default function App() {
     <main className="app-shell">
       <nav className="topbar" aria-label="Application header">
         <a className="brand" href="#top" aria-label="FocusFlow home">
-          <img src="/icons/icon-96.png" alt="" />
+          <img src="./icons/icon-96.png" alt="" />
           <span>FocusFlow</span>
         </a>
         <div className="topbar-actions">
@@ -185,3 +185,4 @@ export default function App() {
     </main>
   );
 }
+

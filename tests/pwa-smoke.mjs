@@ -25,7 +25,13 @@ function pass(name, detail = "") {
 
 
 try {
-  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, serviceWorkers: "allow" });
+  const simulatedLocation = { latitude: 55.864237, longitude: -4.251806 };
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 1000 },
+    serviceWorkers: "allow",
+    geolocation: simulatedLocation,
+    permissions: ["geolocation"],
+  });
   const page = await context.newPage();
   const pageErrors = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
@@ -44,18 +50,39 @@ try {
   assert(manifest.icons.some((icon) => icon.purpose === "maskable"));
   pass("Manifest is valid at runtime", "standalone + 192/512/maskable icons");
 
-  const taskName = `Offline test ${Date.now()}`;
+  const originalTaskName = `Geolocation test ${Date.now()}`;
+  const taskName = `${originalTaskName} updated`;
   const initialCount = await page.locator(".task-item").count();
-  await page.getByLabel("What needs your attention?").fill(taskName);
+  await page.getByLabel("What needs your attention?").fill(originalTaskName);
   await page.getByRole("button", { name: "Add task" }).click();
-  const createdTask = page.locator(".task-item", { hasText: taskName });
+  let createdTask = page.locator(".task-item", { hasText: originalTaskName });
   await createdTask.waitFor();
   assert.equal(await page.locator(".task-item").count(), initialCount + 1);
-  await createdTask.locator("label").click();
+  const location = createdTask.locator('[data-testid="task-location"]');
+  await location.filter({ hasText: "55.864237" }).waitFor();
+  assert.match(await location.innerText(), /\| la 55\.864237 \| lo -4\.251806/);
+  const savedLocation = await page.evaluate((name) => {
+    const task = JSON.parse(localStorage.getItem("tasks")).find((item) => item.name === name);
+    return { id: task.id, location: task.location };
+  }, originalTaskName);
+  assert.match(savedLocation.id, /^todo-/);
+  assert.deepEqual(savedLocation.location, {
+    latitude: "55.864237",
+    longitude: "-4.251806",
+    error: "",
+  });
+  pass("Geolocation is attached to the new task", "simulated latitude/longitude saved with todo-nanoid ID");
+
+  await page.getByRole("button", { name: `Edit ${originalTaskName}` }).click();
+  await page.getByLabel(`New name for ${originalTaskName}`).fill(taskName);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  createdTask = page.locator(".task-item", { hasText: taskName });
+  await createdTask.waitFor();
+  await createdTask.locator(".task-main").click();
   assert.equal(await createdTask.locator('input[type="checkbox"]').isChecked(), true);
   await page.reload({ waitUntil: "networkidle" });
   assert.equal(await page.locator(".task-item", { hasText: taskName }).getAttribute("class"), "task-item done");
-  pass("Task workflow and persistence", "add, complete and localStorage reload");
+  pass("Task workflow and persistence", "add, edit, complete and localStorage reload");
 
   await page.getByRole("button", { name: "completed", exact: true }).click();
   assert.equal(await page.locator(".task-item", { hasText: taskName }).isVisible(), true);
@@ -98,7 +125,37 @@ try {
   await page.screenshot({ path: resolve("test-results/focusflow-desktop.png"), fullPage: true });
   await context.close();
 
-  const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+  const deniedContext = await browser.newContext({ viewport: { width: 900, height: 800 } });
+  await deniedContext.addInitScript(() => {
+    Object.defineProperty(navigator, "geolocation", {
+      configurable: true,
+      value: {
+        getCurrentPosition(_success, error) {
+          setTimeout(() => error({ code: 1 }), 0);
+        },
+      },
+    });
+  });
+  const deniedPage = await deniedContext.newPage();
+  await deniedPage.goto(BASE_URL, { waitUntil: "networkidle" });
+  const deniedTaskName = `Permission fallback ${Date.now()}`;
+  await deniedPage.getByLabel("What needs your attention?").fill(deniedTaskName);
+  await deniedPage.getByRole("button", { name: "Add task" }).click();
+  const deniedTask = deniedPage.locator(".task-item", { hasText: deniedTaskName });
+  await deniedTask.getByText("Location permission was denied.").waitFor();
+  assert.match(
+    await deniedTask.locator('[data-testid="task-location"]').innerText(),
+    /\| la Unavailable \| lo Unavailable/,
+  );
+  pass("Permission-denied fallback", "task remains usable and displays a clear location error");
+  await deniedContext.close();
+
+  const mobileContext = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 1,
+    geolocation: simulatedLocation,
+    permissions: ["geolocation"],
+  });
   const mobilePage = await mobileContext.newPage();
   await mobilePage.goto(BASE_URL, { waitUntil: "networkidle" });
   const mobileLayout = await mobilePage.evaluate(() => ({
@@ -117,3 +174,4 @@ try {
 } finally {
   await browser.close();
 }
+

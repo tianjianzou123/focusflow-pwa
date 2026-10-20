@@ -2,7 +2,7 @@
   "id": ".",
   "name": "FocusFlow Tasks",
   "short_name": "FocusFlow",
-  "description": "A fast, installable and offline-ready task manager.",
+  "description": "A location-aware, installable and offline-ready task manager.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
@@ -31,4 +31,5 @@
     }
   ]
 }
+
 

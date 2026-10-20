@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
+    "nanoid": "^6.0.2",
     "react": "latest",
     "react-dom": "latest",
     "vite": "latest"
@@ -25,3 +26,4 @@
     "playwright-core": "1.64.0"
   }
 }
+

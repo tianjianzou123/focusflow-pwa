@@ -114,4 +114,3 @@ tests/pwa-smoke.mjs         automated geolocation and PWA checks
 ```
 
 Location data stays in the current browser's local storage; the application does not send it to a server.
-
